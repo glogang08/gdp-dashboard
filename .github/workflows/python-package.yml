@@ -1,0 +1,46 @@
+import streamlit as st
+import pandas as pd
+
+# --- Data Storage (consider a database for real-world app) ---
+if 'player_data' not in st.session_state:
+    st.session_state.player_data = pd.DataFrame(
+        columns=[
+            "Player Name",
+            "Grade",
+            "Behavior",
+            "Attendance"
+        ]
+    )
+
+# --- Functions ---
+def add_player():
+    with st.form("add_player_form"):
+        player_name = st.text_input("Player Name")
+        grade = st.number_input("Grade", min_value=0, max_value=100)
+        behavior = st.selectbox("Behavior", ["Excellent", "Good", "Improving", "Needs Improvement"])
+        attendance = st.radio("Attendance", ["Present", "Absent", "Excused Absence"])
+        submitted = st.form_submit_button("Add Player")
+        if submitted:
+            st.session_state.player_data = st.session_state.player_data.append(
+                {
+                    "Player Name": player_name,
+                    "Grade": grade,
+                    "Behavior": behavior,
+                    "Attendance": attendance
+                },
+                ignore_index=True
+            )
+
+def view_data():
+    st.write(st.session_state.player_data)
+
+# --- App Layout ---
+st.title("Basketball Team Tracker")
+
+st.sidebar.title("Menu")
+page = st.sidebar.radio("Select an option:", ["Add Player", "View Data"])
+
+if page == "Add Player":
+    add_player()
+elif page == "View Data":
+    view_data()
